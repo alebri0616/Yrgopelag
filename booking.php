@@ -4,7 +4,7 @@ require_once 'db.php';
 
 $myApiKey = 'b6483622-94ad-4591-bf29-bffdcf149717';
 $myUsername = 'Alexandru';
-$centralBankUrl = 'https://www.yrgopelag.se/centralbank/    ';
+$centralBankUrl = 'https://www.yrgopelag.se';
 
 $db = getDatabase();
 
@@ -52,7 +52,7 @@ curl_setopt($curl, CURLOPT_POST, true);
 curl_setopt($curl, CURLOPT_POSTFIELDS, $validateData);
 curl_setopt($curl, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
 $validateResponse = curl_exec($curl);
-curl_close($curl);
+
 
 $validation = json_decode($validateResponse, true);
 
