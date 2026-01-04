@@ -61,3 +61,23 @@ if ($validation['status'] !== 'success') {
     echo "<br><a href='index.php'>Go back</a>";
     exit;
 }
+
+$depositUrl = $centralBankUrl . '/centralbank/deposit';
+$depositData = http_build_query([
+    'user' => $myUsername,
+    'transferCode' => $transferCode
+]);
+
+$curl = curl_init($depositUrl);
+curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($curl, CURLOPT_POST, true);
+curl_setopt($curl, CURLOPT_POSTFIELDS, $depositData);
+$depositResponse = curl_exec($curl);
+
+$deposit = json_decode($depositResponse, true);
+
+if ($deposit['status'] !== 'success') {
+    echo "Error: Payment failed. Please try again.";
+    echo "<br><a href='index.php'>Go back</a>";
+    exit;
+}
