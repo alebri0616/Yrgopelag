@@ -15,6 +15,7 @@
     <title>Hotel</title>
 </head>
 <body>
-    
+    <h1>Magical Island Hotel</h1>
+    <p> Welcome to the island of a life time!</p>
 </body>
 </html>
