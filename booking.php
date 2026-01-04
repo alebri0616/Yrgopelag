@@ -13,3 +13,9 @@ $roomType = $_POST['room_type'];
 $arrivalDate = $_POST['arrival_date'];
 $departureDate = $_POST['departure_date'];
 $transferCode = $_POST['transfer_code'];
+
+$roomPrices = [
+    'budget' => 100,
+    'standard' => 200,
+    'luxury' => 300
+];
