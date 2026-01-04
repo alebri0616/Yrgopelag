@@ -27,3 +27,6 @@ $departure = new DateTime($departureDate);
 $nights = $arrival->diff($departure)->days;
 
 $totalCost = $pricePerNight * $nights;
+
+$checkAvailability = $db->prepare("SELECT COUNT(*) as count FROM bookings WHERE room_type = ? AND arrival_date < ? AND departure_date > ?
+");
