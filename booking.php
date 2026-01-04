@@ -95,3 +95,21 @@ $saveBooking->execute([
     $totalCost,
     $transferCode
 ]);
+
+$receiptUrl = $centralBankUrl . '/centralbank/receipt';
+$receiptData = json_encode([
+    'user' => $myUsername,
+    'api_key' => $myApiKey,
+    'guest_name' => $guestName,
+    'arrival_date' => $arrivalDate,
+    'departure_date' => $departureDate,
+    'features_used' => [],
+    'star_rating' => 1
+]);
+
+$curl = curl_init($receiptUrl);
+curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($curl, CURLOPT_POST, true);
+curl_setopt($curl, CURLOPT_POSTFIELDS, $receiptData);
+curl_setopt($curl, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+curl_exec($curl);
