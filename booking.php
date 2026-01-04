@@ -30,3 +30,12 @@ $totalCost = $pricePerNight * $nights;
 
 $checkAvailability = $db->prepare("SELECT COUNT(*) as count FROM bookings WHERE room_type = ? AND arrival_date < ? AND departure_date > ?
 ");
+
+$checkAvailability->execute([$roomType, $departureDate, $arrivalDate]);
+$result = $checkAvailability->fetch();
+
+if ($result['count'] > 0) {
+    echo "Sorry! This room is already booked for those dates.";
+    echo "<br><a href='index.php'>Go back</a>";
+    exit;
+}
