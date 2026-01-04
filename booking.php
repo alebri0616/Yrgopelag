@@ -19,3 +19,9 @@ $roomPrices = [
     'standard' => 200,
     'luxury' => 300
 ];
+
+$pricePerNight = $roomPrices[$roomType];
+
+$arrival = new DateTime($arrivalDate);
+$departure = new DateTime($departureDate);
+$nights = $arrival->diff($departure)->days;
