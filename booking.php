@@ -81,3 +81,17 @@ if ($deposit['status'] !== 'success') {
     echo "<br><a href='index.php'>Go back</a>";
     exit;
 }
+
+$saveBooking = $db->prepare("
+    INSERT INTO bookings (guest_name, room_type, arrival_date, departure_date, total_cost, transfer_code)
+    VALUES (?, ?, ?, ?, ?, ?)
+");
+
+$saveBooking->execute([
+    $guestName,
+    $roomType,
+    $arrivalDate,
+    $departureDate,
+    $totalCost,
+    $transferCode
+]);
