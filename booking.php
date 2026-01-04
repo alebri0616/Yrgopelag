@@ -25,3 +25,5 @@ $pricePerNight = $roomPrices[$roomType];
 $arrival = new DateTime($arrivalDate);
 $departure = new DateTime($departureDate);
 $nights = $arrival->diff($departure)->days;
+
+$totalCost = $pricePerNight * $nights;
