@@ -7,3 +7,9 @@ $myUsername = 'Alexandru';
 $centralBankUrl = 'https://your-central-bank-url.com';
 
 $db = getDatabase();
+
+$guestName = $_POST['guest_name'];
+$roomType = $_POST['room_type'];
+$arrivalDate = $_POST['arrival_date'];
+$departureDate = $_POST['departure_date'];
+$transferCode = $_POST['transfer_code'];
