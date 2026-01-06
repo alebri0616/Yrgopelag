@@ -131,7 +131,7 @@ try {
 <?php require_once 'header.php'; ?>
 
 <div class="confirmation">
-    <h1>✓ Booking Confirmed!</h1>
+    <h1> Booking Confirmed!</h1>
     
     <p>Thank you for choosing Magical Island Hotel!</p>
     
