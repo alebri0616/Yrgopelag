@@ -15,4 +15,4 @@ declare(strict_types=1);
             <h1> Magical Island Hotel </h1>
             <p class="tagline">Where dreams meet the ocean breeze</p>
         </header>
-        
+    <main>

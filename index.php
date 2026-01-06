@@ -1,6 +1,11 @@
 <?php
 require_once 'header.php';
 
+$budgetPrice = 100;
+$standardPrice = 200;
+$luxuryPrice = 300;
+
+
 ?>
 
     <form action="booking.php" method="POST">
