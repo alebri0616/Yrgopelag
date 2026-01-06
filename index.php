@@ -1,25 +1,7 @@
-<?php 
-declare(strict_types=1);
-
+<?php
+require_once 'header.php';
 
 ?>
-
-
-
-
-
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/styles/style.css">
-    <title>Hotel</title>
-</head>
-<body>
-    <h1>Magical Island Hotel</h1>
-    <p> Welcome to the island of a life time!</p>
 
     <form action="booking.php" method="POST">
     <h2 class="form-title">Book Your Stay</h2>
