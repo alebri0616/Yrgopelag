@@ -1,6 +1,6 @@
 <?php
 require_once 'header.php';
-
+require_once 'calendar.php';
 $budgetPrice = 100;
 $standardPrice = 200;
 $luxuryPrice = 300;
@@ -24,6 +24,15 @@ $luxuryPrice = 300;
         <h3> Luxury Room</h3>
         <p>Ultimate magical experience</p>
         <div class="price"><?php echo $luxuryPrice; ?> credits/night</div>
+    </div>
+</div>
+
+<div class="calendars-section">
+    <h2> January 2026 Availability</h2>
+    <div class="calendars-container">
+        <?php echo renderCalendar('budget', ' Budget Room'); ?>
+        <?php echo renderCalendar('standard', ' Standard Room'); ?>
+        <?php echo renderCalendar('luxury', ' Luxury Room'); ?>
     </div>
 </div>
 
