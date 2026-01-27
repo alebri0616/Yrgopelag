@@ -1,17 +1,17 @@
 <?php 
 declare(strict_types=1);
 
-require_once 'vendor/autoload.php';
+require_once __DIR__ . '/../vendor/autoload.php';
 
-require_once 'db.php';
+require_once __DIR__ . '/../app/db.php';
 
 ob_start();
 
 use GuzzleHttp\Client;
 
-$myApiKey = 'b6483622-94ad-4591-bf29-bffdcf149717';
-$myUsername = 'Alexandru';
-$centralBankUrl = 'https://www.yrgopelag.se';
+$myApiKey = getEnvVar('API_KEY');
+$myUsername = getEnvVar('USER');
+$centralBankUrl = getEnvVar('CENTRAL_BANK_URL');
 
 $db = getDatabase();
 
@@ -21,13 +21,17 @@ $arrivalDate = $_POST['arrival_date'];
 $departureDate = $_POST['departure_date'];
 $transferCode = $_POST['transfer_code'];
 
-$roomPrices = [
-    'budget' => 100,
-    'standard' => 200,
-    'luxury' => 300
-];
+$roomQuery = $db->prepare("SELECT price_per_night FROM rooms WHERE room_type = ?");
+$roomQuery->execute([$roomType]);
+$room = $roomQuery->fetch();
 
-$pricePerNight = $roomPrices[$roomType];
+if (!$room) {
+    echo "Error: Invalid room type selected.";
+    echo "<br><a href='../index.php'>Go back</a>";
+    exit;
+}
+
+$pricePerNight = $room['price_per_night'];
 
 $arrival = new DateTime($arrivalDate);
 $departure = new DateTime($departureDate);
@@ -43,7 +47,7 @@ $result = $checkAvailability->fetch();
 
 if ($result['count'] > 0) {
     echo "Sorry! This room is already booked for those dates.";
-    echo "<br><a href='index.php'>Go back</a>";
+    echo "<br><a href='../index.php'>Go back</a>";
     exit;
 }
 
@@ -66,12 +70,12 @@ try {
     
     if ($validation['status'] !== 'success') {
         echo "Error: Your transfer code is not valid or doesn't have enough money.";
-        echo "<br><a href='index.php'>Go back</a>";
+        echo "<br><a href='../index.php'>Go back</a>";
         exit;
     }
 } catch (Exception $e) {
     echo "Error validating transfer code: " . $e->getMessage();
-    echo "<br><a href='index.php'>Go back</a>";
+    echo "<br><a href='../index.php'>Go back</a>";
     exit;
 }
 
@@ -87,12 +91,12 @@ try {
     
     if ($deposit['status'] !== 'success') {
         echo "Error: Payment failed. Please try again.";
-        echo "<br><a href='index.php'>Go back</a>";
+        echo "<br><a href='../index.php'>Go back</a>";
         exit;
     }
 } catch (Exception $e) {
     echo "Error processing payment: " . $e->getMessage();
-    echo "<br><a href='index.php'>Go back</a>";
+    echo "<br><a href='../index.php'>Go back</a>";
     exit;
 }
 
@@ -146,7 +150,7 @@ try {
     
     <p> Your magical adventure awaits! </p>
     
-    <a href="index.php">Back to Home</a>
+    <a href="../index.php">Back to Home</a>
 </div>
 
 <?php require_once 'footer.php'; ?>

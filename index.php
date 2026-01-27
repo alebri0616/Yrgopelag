@@ -1,38 +1,34 @@
 <?php
-require_once 'header.php';
-require_once 'calendar.php';
-$budgetPrice = 100;
-$standardPrice = 200;
-$luxuryPrice = 300;
+declare(strict_types=1);
+require_once __DIR__ . '/app/header.php';
+require_once __DIR__ . '/app/calendar.php';
+require_once __DIR__ . '/app/db.php';
 
+$db = getDatabase();
+$roomsQuery = $db->query("SELECT * FROM rooms ORDER BY price_per_night ASC");
+$rooms = $roomsQuery->fetchAll(PDO::FETCH_ASSOC);
 
+$roomPrices = [];
+foreach ($rooms as $room) {
+    $roomPrices[$room['room_type']] = $room['price_per_night'];
+}
 ?>
 <div class="rooms">
+    <?php foreach ($rooms as $room): ?>
     <div class="room">
-        <h3> Budget Room</h3>
-        <p>Cozy and comfortable</p>
-        <div class="price"><?php echo $budgetPrice; ?> credits/night</div>
+        <h3><?php echo htmlspecialchars($room['room_type']); ?></h3>
+        <p><?php echo htmlspecialchars($room['room_name']); ?></p>
+        <div class="price"><?php echo $room['price_per_night']; ?> credits/night</div>
     </div>
-    
-    <div class="room">
-        <h3> Standard Room</h3>
-        <p>Perfect island retreat</p>
-        <div class="price"><?php echo $standardPrice; ?> credits/night</div>
-    </div>
-    
-    <div class="room">
-        <h3> Luxury Room</h3>
-        <p>Ultimate magical experience</p>
-        <div class="price"><?php echo $luxuryPrice; ?> credits/night</div>
-    </div>
+    <?php endforeach; ?>
 </div>
 
 <div class="calendars-section">
     <h2> January 2026 Availability</h2>
     <div class="calendars-container">
-        <?php echo renderCalendar('budget', ' Budget Room'); ?>
-        <?php echo renderCalendar('standard', ' Standard Room'); ?>
-        <?php echo renderCalendar('luxury', ' Luxury Room'); ?>
+        <?php foreach ($rooms as $room): ?>
+            <?php echo renderCalendar($room['room_type'],$room['room_name']); ?>
+        <?php endforeach; ?>
     </div>
 </div>
 
@@ -47,7 +43,8 @@ $luxuryPrice = 300;
     </ol>
 </div>
 
-<form action="booking.php" method="POST">
+<form class="mainBooking" action="/app/booking.php" method="POST">
+    <div class="bookingForm">
     <h2 class="form-title">Book Your Magical Stay</h2>
     
     <div class="form-group">
@@ -59,9 +56,12 @@ $luxuryPrice = 300;
         <label for="room_type">Choose Your Room:</label>
         <select id="room_type" name="room_type" required>
             <option value="">-- Select a room --</option>
-            <option value="budget"> Budget Room (<?php echo $budgetPrice; ?> credits/night)</option>
-            <option value="standard"> Standard Room (<?php echo $standardPrice; ?> credits/night)</option>
-            <option value="luxury"> Luxury Room (<?php echo $luxuryPrice; ?> credits/night)</option>
+            <?php foreach ($rooms as $room): ?>
+            <option value="<?php echo htmlspecialchars($room['room_type']); ?>">
+                <?php echo htmlspecialchars($room['room_type']); ?> 
+                (<?php echo $room['price_per_night']; ?> credits/night)
+            </option>
+            <?php endforeach; ?>
         </select>
     </div>
     
@@ -95,10 +95,20 @@ $luxuryPrice = 300;
     </div>
     
     <button type="submit"> Complete Booking </button>
+    </div>
+    <div class="hotelImages">
+    <img src="/images/badhotel.jpeg" alt="hotel luxury">
+    <b><h3>Budget</h3></b>
+    <img src="/images/standardhotel.jpeg" alt="hotel luxury">
+    <b><h3>Standard</h3></b>
+    <img src="/images/luxuryhotel.webp" alt="hotel luxury">
+    <b><h3>Luxury</h3></b>
+    </div>
 </form>
+
 
 <?php
 
-require_once 'footer.php';
+require_once __DIR__ . '/app/footer.php';
 
 ?>
