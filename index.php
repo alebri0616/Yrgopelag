@@ -1,23 +1,25 @@
 <?php
-declare(strict_types=1);
-require_once __DIR__ . '/app/header.php';
-require_once __DIR__ . '/app/calendar.php';
-require_once __DIR__ . '/app/db.php';
+require_once 'app/header.php';
+require_once 'app/calendar.php';
+require_once 'app/db.php';
+
 
 $db = getDatabase();
 $roomsQuery = $db->query("SELECT * FROM rooms ORDER BY price_per_night ASC");
 $rooms = $roomsQuery->fetchAll(PDO::FETCH_ASSOC);
+
 
 $roomPrices = [];
 foreach ($rooms as $room) {
     $roomPrices[$room['room_type']] = $room['price_per_night'];
 }
 ?>
+
 <div class="rooms">
     <?php foreach ($rooms as $room): ?>
     <div class="room">
-        <h3><?php echo htmlspecialchars($room['room_type']); ?></h3>
-        <p><?php echo htmlspecialchars($room['room_name']); ?></p>
+        <h3> <?php echo htmlspecialchars($room['room_name']); ?></h3>
+        <h2><?php echo htmlspecialchars($room['room_type']); ?></h2>
         <div class="price"><?php echo $room['price_per_night']; ?> credits/night</div>
     </div>
     <?php endforeach; ?>
@@ -27,7 +29,7 @@ foreach ($rooms as $room) {
     <h2> January 2026 Availability</h2>
     <div class="calendars-container">
         <?php foreach ($rooms as $room): ?>
-            <?php echo renderCalendar($room['room_type'],$room['room_name']); ?>
+            <?php echo renderCalendar($room['id'],$room['room_name']); ?>
         <?php endforeach; ?>
     </div>
 </div>
@@ -43,7 +45,7 @@ foreach ($rooms as $room) {
     </ol>
 </div>
 
-<form class="mainBooking" action="/app/booking.php" method="POST">
+<form class="mainBooking" action="app/booking.php" method="POST">
     <div class="bookingForm">
     <h2 class="form-title">Book Your Magical Stay</h2>
     
@@ -53,12 +55,12 @@ foreach ($rooms as $room) {
     </div>
     
     <div class="form-group">
-        <label for="room_type">Choose Your Room:</label>
-        <select id="room_type" name="room_type" required>
+        <label for="room_id">Choose Your Room:</label>
+        <select id="room_id" name="room_id" required>
             <option value="">-- Select a room --</option>
             <?php foreach ($rooms as $room): ?>
-            <option value="<?php echo htmlspecialchars($room['room_type']); ?>">
-                <?php echo htmlspecialchars($room['room_type']); ?> 
+            <option value="<?php echo $room['id']; ?>">
+                 <?php echo htmlspecialchars($room['room_name']); ?> 
                 (<?php echo $room['price_per_night']; ?> credits/night)
             </option>
             <?php endforeach; ?>
@@ -97,18 +99,13 @@ foreach ($rooms as $room) {
     <button type="submit"> Complete Booking </button>
     </div>
     <div class="hotelImages">
-    <img src="/images/badhotel.jpeg" alt="hotel luxury">
+    <img src="/images/badhotel.jpeg" alt="hotel budget">
     <b><h3>Budget</h3></b>
-    <img src="/images/standardhotel.jpeg" alt="hotel luxury">
+    <img src="/images/standardhotel.jpeg" alt="hotel standard">
     <b><h3>Standard</h3></b>
     <img src="/images/luxuryhotel.webp" alt="hotel luxury">
     <b><h3>Luxury</h3></b>
     </div>
 </form>
 
-
-<?php
-
-require_once __DIR__ . '/app/footer.php';
-
-?>
+<?php require_once 'app/footer.php'; ?>

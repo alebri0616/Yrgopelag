@@ -1,20 +1,19 @@
 <?php
-
 declare(strict_types=1);
 
 require_once 'db.php';
 
-function getBookedDates(string $roomType): array
+function getBookedDates(int $roomId): array
 {
     $db = getDatabase();
     
     $stmt = $db->prepare("
         SELECT arrival_date, departure_date 
         FROM bookings 
-        WHERE room_type = ?
+        WHERE room_id = ?
     ");
     
-    $stmt->execute([$roomType]);
+    $stmt->execute([$roomId]);
     $bookings = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
     $bookedDates = [];
@@ -32,27 +31,26 @@ function getBookedDates(string $roomType): array
     return $bookedDates;
 }
 
-function renderCalendar(string $roomType, string $roomName): string
+function renderCalendar(int $roomId, string $roomName): string
 {
-    $bookedDates = getBookedDates($roomType);
+    $bookedDates = getBookedDates($roomId);
     
     $html = '<div class="calendar">';
-    $html .= '<h3>' . $roomName . '</h3>';
+    $html .= '<h3>' . htmlspecialchars($roomName) . '</h3>';
     $html .= '<div class="calendar-grid">';
     
-
+    
     $days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
     foreach ($days as $day) {
         $html .= '<div class="calendar-day-header">' . $day . '</div>';
     }
     
     
-
     for ($i = 0; $i < 3; $i++) {
         $html .= '<div class="calendar-day empty"></div>';
     }
     
-
+    
     for ($day = 1; $day <= 31; $day++) {
         $date = sprintf('2026-01-%02d', $day);
         $isBooked = in_array($date, $bookedDates);

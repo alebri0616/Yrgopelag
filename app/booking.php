@@ -3,11 +3,12 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-require_once __DIR__ . '/../app/db.php';
+require_once 'db.php';
 
 ob_start();
 
 use GuzzleHttp\Client;
+
 
 $myApiKey = getEnvVar('API_KEY');
 $myUsername = getEnvVar('USER');
@@ -15,14 +16,28 @@ $centralBankUrl = getEnvVar('CENTRAL_BANK_URL');
 
 $db = getDatabase();
 
+
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    header('Location: ../index.php');
+    exit;
+}
+
+
+if (!isset($_POST['guest_name'], $_POST['room_id'], $_POST['arrival_date'], $_POST['departure_date'], $_POST['transfer_code'])) {
+    echo "Error: Missing required fields.";
+    echo "<br><a href='../index.php'>Go back</a>";
+    exit;
+}
+
 $guestName = $_POST['guest_name'];
-$roomType = $_POST['room_type'];
+$roomId = (int)$_POST['room_id'];
 $arrivalDate = $_POST['arrival_date'];
 $departureDate = $_POST['departure_date'];
 $transferCode = $_POST['transfer_code'];
 
-$roomQuery = $db->prepare("SELECT price_per_night FROM rooms WHERE room_type = ?");
-$roomQuery->execute([$roomType]);
+
+$roomQuery = $db->prepare("SELECT id, room_name, price_per_night FROM rooms WHERE id = ?");
+$roomQuery->execute([$roomId]);
 $room = $roomQuery->fetch();
 
 if (!$room) {
@@ -39,10 +54,13 @@ $nights = $arrival->diff($departure)->days;
 
 $totalCost = $pricePerNight * $nights;
 
-$checkAvailability = $db->prepare("SELECT COUNT(*) as count FROM bookings WHERE room_type = ? AND arrival_date < ? AND departure_date > ?
+
+$checkAvailability = $db->prepare("
+    SELECT COUNT(*) as count FROM bookings 
+    WHERE room_id = ? AND arrival_date < ? AND departure_date > ?
 ");
 
-$checkAvailability->execute([$roomType, $departureDate, $arrivalDate]);
+$checkAvailability->execute([$roomId, $departureDate, $arrivalDate]);
 $result = $checkAvailability->fetch();
 
 if ($result['count'] > 0) {
@@ -51,11 +69,7 @@ if ($result['count'] > 0) {
     exit;
 }
 
-$client = new Client([
-    'verify' => false
-
-]);
-
+$client = new Client(['verify' => false]);
 
 
 try {
@@ -66,7 +80,7 @@ try {
         ]
     ]);
 
- $validation = json_decode($validateResponse->getBody()->getContents(), true);
+    $validation = json_decode($validateResponse->getBody()->getContents(), true);
     
     if ($validation['status'] !== 'success') {
         echo "Error: Your transfer code is not valid or doesn't have enough money.";
@@ -78,6 +92,7 @@ try {
     echo "<br><a href='../index.php'>Go back</a>";
     exit;
 }
+
 
 try {
     $depositResponse = $client->post($centralBankUrl . '/centralbank/deposit', [
@@ -101,20 +116,20 @@ try {
 }
 
 
-
 $saveBooking = $db->prepare("
-    INSERT INTO bookings (guest_name, room_type, arrival_date, departure_date, total_cost, transfer_code)
+    INSERT INTO bookings (guest_name, room_id, arrival_date, departure_date, total_cost, transfer_code)
     VALUES (?, ?, ?, ?, ?, ?)
 ");
 
 $saveBooking->execute([
     $guestName,
-    $roomType,
+    $roomId,
     $arrivalDate,
     $departureDate,
     $totalCost,
     $transferCode
 ]);
+
 
 try {
     $client->post($centralBankUrl . '/centralbank/receipt', [
@@ -129,7 +144,7 @@ try {
         ]
     ]);
 } catch (Exception $e) {
-
+    
 }
 ?>
 <?php require_once 'header.php'; ?>
@@ -141,7 +156,7 @@ try {
     
     <div class="details">
         <p><strong>Guest Name:</strong> <?php echo htmlspecialchars($guestName); ?></p>
-        <p><strong>Room Type:</strong> <?php echo htmlspecialchars(ucfirst($roomType)); ?> Room</p>
+        <p><strong>Room Type:</strong> <?php echo htmlspecialchars($room['room_name']); ?></p>
         <p><strong>Check-in:</strong> <?php echo htmlspecialchars($arrivalDate); ?> at 15:00</p>
         <p><strong>Check-out:</strong> <?php echo htmlspecialchars($departureDate); ?> at 11:00</p>
         <p><strong>Number of Nights:</strong> <?php echo $nights; ?></p>
